@@ -1,18 +1,18 @@
 APP_NAME=r3hello
 
 all: venv build save
-	echo ok
+	
 
 clean:
-	-docker ps -a | grep $(APP_NAME) && echo "dev isn't clean"
-	echo "Please clean up manuallly:"
-	echo "  docker rm r3hello"
+	-sudo docker ps -a | grep $(APP_NAME) && echo "dev isn't clean"
+	-echo "clean up in 3 seconds, ctrl-c to abort"
+	-sleep 3 && sudo docker rm r3hello
 
 build:
-	docker build -t $(APP_NAME) .
-	docker image ls $(APP_NAME)
+	sudo docker build -t $(APP_NAME) .
+	sudo docker image ls $(APP_NAME)
 venv:
-	if [ -d .py ] ; \
+	@if [ -d .py ] ; \
 	then \
 		echo "virtualenv already built, skipping..."; \
 	else \
@@ -22,28 +22,27 @@ venv:
 
 export:
 	mkdir -p BUILD
-	#docker save $(APP_NAME) > BUILD/$(APP_NAME).tar
-	docker run -d --name $(APP_NAME) $(APP_NAME)
-	docker export $(APP_NAME) > BUILD/$(APP_NAME).tar
+	sudo docker run -d --name $(APP_NAME) $(APP_NAME)
+	sudo docker export $(APP_NAME) > BUILD/$(APP_NAME).tar
 	ls -lh BUILD/
 
 export_test:
 	
 save:
 	mkdir -p BUILD
-	docker save $(APP_NAME) > BUILD/$(APP_NAME).tar
+	sudo docker save $(APP_NAME) > BUILD/$(APP_NAME).tar
 	ls -lh BUILD/
 test:
-	docker image ls $(APP_NAME)_imported_image
-	docker image rm $(APP_NAME)_imported_image 2>/dev/null || echo removed old image
-	cat BUILD/$(APP_NAME).tar | docker import - $(APP_NAME)_imported_image
-	docker run -d --name $(APP_NAME)_imported_app $(APP_NAME)_imported_image
+	sudo docker image ls $(APP_NAME)_imported_image
+	sudo docker image rm $(APP_NAME)_imported_image 2>/dev/null || echo removed old image
+	cat BUILD/$(APP_NAME).tar | sudo docker import - $(APP_NAME)_imported_image
+	sudo docker run -d --name $(APP_NAME)_imported_app $(APP_NAME)_imported_image
 
 
 tmp-release:
 	scp BUILD/r3hello.tar user@10.60.6.242:/home/user/R3_TEMP_BUILD/
 run:
-	docker run --name $(APP_NAME) $(APP_NAME)
+	sudo docker run --name $(APP_NAME) $(APP_NAME)
 
 myapp_run: venv
 	.py/bin/python3 myapp.py
