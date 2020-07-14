@@ -1,7 +1,7 @@
 # CAES
 ## To get this sample repository
 
-git clone git@github.com:FelixHuang9977/CAES.git .
+git clone git@github.com:caes-r3/CAES.git
 
 ## To make edge app container
 - enter sample_container_app folder and use make to build 
